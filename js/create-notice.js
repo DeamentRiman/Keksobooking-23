@@ -12,7 +12,7 @@ const typeOfHouse = {
   hotel: 'Отель',
 };
 
-const mapCanvas = document.querySelector('.map__canvas');
+// const mapCanvas = document.querySelector('.map__canvas');
 const popupCard = document.querySelector('#card').content.querySelector('.popup');
 const imageCard = document.querySelector('#card').content.querySelector('.popup__photo');
 // const popupPhotos = document.querySelector('#card').content.querySelector('.popup__photos');
@@ -40,7 +40,6 @@ similarMassive.forEach(({author, offer}) => {
       imageMassive[i].src = offer.photos[i];
     }
   }
-
   offer.title ? addCard.querySelector('.popup__title').textContent = offer.title : addCard.querySelector('.popup__title').classList.add('hidden');
   offer.address ? addCard.querySelector('.popup__text--address').textContent = offer.address : addCard.querySelector('.popup__text--address').classList('hidden');
   offer.price ? addCard.querySelector('.popup__text--price').textContent = `${offer.price} ₽/ночь` : addCard.querySelector('.popup__text--price').classList('hidden');
@@ -54,6 +53,7 @@ similarMassive.forEach(({author, offer}) => {
   similarListFragment.appendChild(addCard);
 });
 
-mapCanvas.appendChild(similarListFragment);
+// mapCanvas.appendChild(similarListFragment);
 export {similarMassive};
-export {mapCanvas};
+export {typeOfHouse};
+// export {mapCanvas};

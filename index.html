@@ -5,6 +5,9 @@
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
   <title>Кексобукинг</title>
 </head>
 <body>
@@ -19,7 +22,7 @@
     <section class="map">
 
       <!-- Блок для вставки карты -->
-      <div class="map__canvas" id="map-canvas"></div>
+      <div class="map__canvas" id="map-canvas" height="480px"></div>
 
       <!-- Фильтрация объявлений -->
       <div class="map__filters-container">
@@ -71,7 +74,7 @@
     <!-- Форма объявления -->
     <section class="notice">
       <h2 class="notice__title">Ваше объявление</h2>
-      <form class="ad-form" method="post" enctype="multipart/form-data" autocomplete="off">
+      <form class="ad-form" method='POST' action=" https://23.javascript.pages.academy/keksobooking" enctype='multipart/form-data' class="map__filters" autocomplete="off">
         <fieldset class="ad-form-header">
           <legend class="ad-form-header__title">Ваша фотография (для карты)</legend>
           <div class="ad-form-header__upload">
@@ -229,6 +232,17 @@
       <button type="button" class="error__button">Попробовать снова</button>
     </div>
   </template>
+
+  <template id="balloon">
+    <section class="balloon">
+      <h3 class="balloon__title">Остров сокровищ</h3>
+      <p class="balloon__lat-lng">Координаты: 12.34567, 98.76543</p>
+    </section>
+  </template>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
   <script type="module" src="/js/main.js"></script>
 </body>
 </html>

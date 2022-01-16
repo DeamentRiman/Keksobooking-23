@@ -1,5 +1,9 @@
-import {similarMassive} from './create-notice.js';
-import {mapCanvas} from './create-notice.js';
+// import {similarMassive} from './create-notice.js';
+import {disabledForm,  availableForm} from './form.js';
+import {formValidator} from './form-validator.js';
+import {map} from './map.js';
 
-// console.log(similarMassive[1]);
-// console.log(mapCanvas);
+
+disabledForm();
+formValidator();
+

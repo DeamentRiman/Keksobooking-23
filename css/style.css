@@ -81,6 +81,7 @@ fieldset {
           flex-direction: column;
 
   overflow: hidden;
+  z-index: 3;
 }
 
 .map__canvas {
@@ -1027,4 +1028,34 @@ fieldset {
 
 .hidden {
   display: none;
+}
+
+.error__message--fetch {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 94px;
+  /* background-color: #960028; */
+  background-color:#353535;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  opacity: 0.8;
+  padding: 10px;
+}
+
+.error__message-text {
+  font-size: 26px;
+  line-height: 27px;
+  text-align: center;
+  color: #f8f8f8;
+}
+
+.error__button--fetch {
+  position: absolute;
+  content: "";
+  top: 20px;
+  right: 22px;
 }

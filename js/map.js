@@ -1,7 +1,9 @@
 //Подключение карты Leaflets
 import {typeOfHouse} from './create-notice.js';
-import {similarMassive} from './create-notice.js';
+// import {similarMassive} from './create-notice.js';
 import {disabledForm,  availableForm} from './form.js';
+import {errorUpload} from './fetch-error.js';
+
 
 const MAP_SCALE = 10;
 const TOKIO_LAT = 35.6895000;
@@ -18,8 +20,9 @@ const DECIMAL_POINT = 5;
 const MAIN_PIN_ICON_IMG = 'img/main-pin.svg';
 const PIN_ICON_IMG = 'img/pin.svg';
 
+disabledForm();
+let defaultAddress = document.querySelector('#address');
 
-const defaultAddress = document.querySelector('#address');
 
 //Инициализация карты
 const map = L.map('map-canvas')
@@ -93,13 +96,13 @@ const createCustomPopup = ({author, offer}) => {
     }
   }
   offer.title ? addCard.querySelector('.popup__title').textContent = offer.title : addCard.querySelector('.popup__title').classList.add('hidden');
-  offer.address ? addCard.querySelector('.popup__text--address').textContent = offer.address : addCard.querySelector('.popup__text--address').classList('hidden');
-  offer.price ? addCard.querySelector('.popup__text--price').textContent = `${offer.price} ₽/ночь` : addCard.querySelector('.popup__text--price').classList('hidden');
-  offer.type ? addCard.querySelector('.popup__type').textContent = typeOfHouse[offer.type] : addCard.querySelector('.popup__type').classList('hidden');
-  offer.rooms || offer.guests ? addCard.querySelector('.popup__text--capacity').textContent = `${offer.rooms} комнаты для ${offer.guests} гостей` : addCard.querySelector('.popup__text--capacity').classList('hidden');
-  offer.checkin || offer.checkout ? addCard.querySelector('.popup__text--time').textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}` : addCard.querySelector('.popup__text--time').classList('hidden');
-  offer.features ? addCard.querySelector('.popup__features').textContent = offer.features : addCard.querySelector('.popup__features').classList('hidden');
-  offer.description ? addCard.querySelector('.popup__description').textContent = offer.description : addCard.querySelector('.popup__description').classList('hidden');
+  offer.address ? addCard.querySelector('.popup__text--address').textContent = offer.address : addCard.querySelector('.popup__text--address').classList.add('hidden');
+  offer.price ? addCard.querySelector('.popup__text--price').textContent = `${offer.price} ₽/ночь` : addCard.querySelector('.popup__text--price').classList.add('hidden');
+  offer.type ? addCard.querySelector('.popup__type').textContent = typeOfHouse[offer.type] : addCard.querySelector('.popup__type').classList.add('hidden');
+  offer.rooms || offer.guests ? addCard.querySelector('.popup__text--capacity').textContent = `${offer.rooms} комнаты для ${offer.guests} гостей` : addCard.querySelector('.popup__text--capacity').classList.add('hidden');
+  offer.checkin || offer.checkout ? addCard.querySelector('.popup__text--time').textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}` : addCard.querySelector('.popup__text--time').classList.add('hidden');
+  offer.features ? addCard.querySelector('.popup__features').textContent = offer.features : addCard.querySelector('.popup__features').classList.add('hidden');
+  offer.description ? addCard.querySelector('.popup__description').textContent = offer.description : addCard.querySelector('.popup__description').classList.add('hidden');
   offer.photos ? imageInputer() : addCard.querySelector('.popup__photo').classList.add('hidden');
   author.avatar ? addCard.querySelector('.popup__avatar').src = author.avatar : addCard.querySelector('.popup__avatar').classList.add('hidden');
   return addCard;
@@ -126,9 +129,107 @@ const createMarker = ({author, offer, location}) => {
     });
 };
 
-//Обработчик для меток с целью их отрисовки на карте
-similarMassive.forEach(({author, offer, location}) => {
-  createMarker({author, offer, location});
+//Обработчик для меток с целью их отрисовки на карте - отрисовка меток с рандомными данными
+// similarMassive.forEach(({author, offer, location}) => {
+//   createMarker({author, offer, location});
+// });
+
+//Модуль получения и отправления данных на сервер
+const getDataUrl = 'https://23.javascript.pages.academy/keksobooking/data';
+const sendDataUrl = 'https://23.javascript.pages.academy/keksobooking/';
+const OFFERS_QUANTITY = 10;
+
+//функция успешного получения данных с сервера
+function successfulUpload(value) {
+  const generateNewOfferList = value.slice(0, OFFERS_QUANTITY);
+  generateNewOfferList.forEach(({author, offer, location}) => {
+    createMarker({author, offer, location});
+  });
+}
+
+const getData = fetch(getDataUrl)
+  .then((response) => (response.ok) ? (response.json()) : (() => {throw new Error (`Упс, что то пошло не так. Ошибка ${response.status}, так досадно не получить данные с сервера.`);})())
+  .then((offer) => successfulUpload(offer))
+  .catch((error) => errorUpload(error));
+
+
+//Отправка данных с формы на сервер
+const adForm = document.querySelector('.ad-form');
+const main = document.querySelector('main');
+const removeButton = document.querySelector('.ad-form__reset');
+
+const failSendMessage = document.querySelector('#error').content.querySelector('.error');
+const failSendPopup = failSendMessage.cloneNode(true);
+const failSendButton = failSendPopup.querySelector('.error__button');
+failSendPopup.classList.add('hidden');
+main.appendChild(failSendPopup);
+
+const successfullSendMessage = document.querySelector('#success').content.querySelector('.success');
+const successfullPopup = successfullSendMessage.cloneNode(true);
+successfullPopup.classList.add('hidden');
+main.appendChild(successfullPopup);
+
+//Очистка формы
+function removeFormData () {
+  const formSend = document.querySelector('.ad-form');
+  formSend.reset();
+  mainPinMarker.setLatLng({
+    lat: TOKIO_LAT,
+    lng: TOKIO_LNG,
+  });
+  console.log(defaultAddress);
+  defaultAddress.defaultValue = (`${TOKIO_LAT}, ${TOKIO_LNG}`);
+}
+
+removeButton.addEventListener('click', () => {
+  removeFormData();
+});
+
+//Закрытие окно при помощи мыши или клавиатуры
+window.addEventListener('keydown', (evt) => {
+  if (evt.key === 'Escape' || evt.key === 'Esc'){
+    if (successfullPopup.classList.contains('hidden') === false) {
+      successfullPopup.classList.add('hidden');
+      removeFormData();
+    } else {
+      failSendPopup.classList.add('hidden');
+    }
+  }
+});
+
+successfullPopup.addEventListener('mousedown', () => {
+  successfullPopup.classList.add('hidden');
+  removeFormData();
+});
+
+//Обработка ошибки отправки
+function failSend () {
+  failSendPopup.classList.remove('hidden');
+}
+
+failSendButton.addEventListener('click', () => {
+  failSendPopup.classList.add('hidden');
+});
+
+failSendPopup.addEventListener('mousedown', () => {
+  failSendPopup.classList.add('hidden');
+});
+
+//Обработка успешно отправленных данных
+function successfullSend () {
+  successfullPopup.classList.remove('hidden');
+}
+
+adForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  const sendData = fetch(sendDataUrl,
+    {
+      method: 'POST',
+      body: new FormData(adForm),
+    },
+  )
+    .then((response) => (response.ok) ? successfullSend() : (() => {throw new Error (`Упс, что то пошло не так. Ошибка ${response.status}, так досадно, что не получилось отправить данные на сервер.`);})())
+    .catch((error) => failSend(error));
 });
 
 export {map};

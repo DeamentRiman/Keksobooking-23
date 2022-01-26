@@ -3,6 +3,8 @@ import {typeOfHouse} from './create-notice.js';
 // import {similarMassive} from './create-notice.js';
 import {disabledForm,  availableForm} from './form.js';
 import {errorUpload} from './fetch-error.js';
+import {getFinalFilter, filterFormMap} from './filter-form.js';
+import {debounce} from './utils/debounce.js';
 
 
 const MAP_SCALE = 10;
@@ -22,7 +24,6 @@ const PIN_ICON_IMG = 'img/pin.svg';
 
 disabledForm();
 let defaultAddress = document.querySelector('#address');
-
 
 //Инициализация карты
 const map = L.map('map-canvas')
@@ -134,6 +135,19 @@ const createMarker = ({author, offer, location}) => {
 //   createMarker({author, offer, location});
 // });
 
+//функция для передачи данных сортировки
+const DELAY_TIME = 500;
+
+function dataForFilter (value) {
+  filterFormMap.addEventListener('change', () => {
+    const getFilterDataForMap = getFinalFilter(value);
+    markerGroup.clearLayers();
+    getFilterDataForMap.forEach((item) => {
+      createMarker(item);
+    });
+  });
+}
+
 //Модуль получения и отправления данных на сервер
 const getDataUrl = 'https://23.javascript.pages.academy/keksobooking/data';
 const sendDataUrl = 'https://23.javascript.pages.academy/keksobooking/';
@@ -141,6 +155,7 @@ const OFFERS_QUANTITY = 10;
 
 //функция успешного получения данных с сервера
 function successfulUpload(value) {
+  dataForFilter(value);
   const generateNewOfferList = value.slice(0, OFFERS_QUANTITY);
   generateNewOfferList.forEach(({author, offer, location}) => {
     createMarker({author, offer, location});
@@ -177,7 +192,7 @@ function removeFormData () {
     lat: TOKIO_LAT,
     lng: TOKIO_LNG,
   });
-  console.log(defaultAddress);
+  filterFormMap.reset();
   defaultAddress.defaultValue = (`${TOKIO_LAT}, ${TOKIO_LNG}`);
 }
 
@@ -231,5 +246,56 @@ adForm.addEventListener('submit', (evt) => {
     .then((response) => (response.ok) ? successfullSend() : (() => {throw new Error (`Упс, что то пошло не так. Ошибка ${response.status}, так досадно, что не получилось отправить данные на сервер.`);})())
     .catch((error) => failSend(error));
 });
+
+
+// const OFFERS_VALUE = 10;
+// const ANY = 'any';
+
+// const price = {
+//   low: 'low',
+//   middle: 'middle',
+//   high: 'high',
+//   minCost:'10000',
+//   maxCost:'50000',
+// };
+
+// //найдем фильтры на странице
+// const filterFormMap = document.querySelector('.map__filters');
+// const housingType = filterFormMap.querySelector('#housing-type');
+// const housingPrice = filterFormMap.querySelector('#housing-price');
+// const housingRooms = filterFormMap.querySelector('#housing-rooms');
+// const housingGuests = filterFormMap.querySelector('#housing-guests');
+
+// //найдем выбранное значение типа жилья
+// const filterMatch = (filterValue, dataField) => filterValue === ANY || String(filterValue) === String(dataField);
+
+// //определение выбранного значения цены
+// const priceMatch = (filterValue, dataField) =>
+//   filterValue === ANY ||
+//   (filterValue === price.low && dataField < price.minCost) ||
+//   (filterValue === price.middle && dataField >= price.minCost && dataField < price.maxCost) ||
+//   (filterValue === price.high && dataField >= price.maxCost);
+
+// //дополнительные опции
+// const selectFeatures = (filterValue, dataValue) => filterValue.every((feature) => dataValue.includes(feature));
+
+// const getFinalFilter = (offers) => {
+//   console.log(offers);
+//   const allCheckFeatures = Array.from(filterFormMap.querySelectorAll('.map__checkbox:checked')).map((element) => element.value);
+//   const filterData = offers.filter((item) => {
+//     const typeValue = item.offer.type ? item.offer.type : '';
+//     const priceValue = item.offer.price ? item.offer.price : '';
+//     const roomsValue = item.offer.rooms ? item.offer.rooms : '';
+//     const guestsValue = item.offer.guests ? item.offer.guests : '';
+//     const featuresValue = item.offer.features ? item.offer.features : [];
+
+//     return filterMatch(housingType.value, typeValue) &&
+//     priceMatch(housingPrice.value, priceValue) &&
+//     filterMatch(housingRooms.value, roomsValue) &&
+//     filterMatch(housingGuests.value, guestsValue) &&
+//     selectFeatures(allCheckFeatures, featuresValue);
+//   });
+//   return filterData.slice(0, OFFERS_VALUE);
+// };
 
 export {map};

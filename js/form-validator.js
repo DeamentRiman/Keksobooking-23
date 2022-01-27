@@ -84,7 +84,7 @@ function formValidator() {
     if (pricePerType.value < minimalPrice) {
       pricePerType.setCustomValidity(`Минимальная стоимость проживания за ночь ${minimalPrice} руб.`);
     }
-    // });
+    });
     pricePerType.reportValidity();
   };
   habitation.addEventListener('change', minPrice);

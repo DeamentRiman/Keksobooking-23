@@ -87,7 +87,7 @@ function formValidator() {
     pricePerType.reportValidity();
   };
   // habitation.addEventListener('input', minPrice);
-  pricePerType.addEventListener('input', minPrice);
+  pricePerType.addEventListener('change', minPrice);
 
   //Время заезда
   const timeIn = document.querySelector('#timein');

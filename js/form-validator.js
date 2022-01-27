@@ -79,15 +79,16 @@ function formValidator() {
     const minimalPrice = priceForHabitation[habitation.value];
     pricePerType.min = minimalPrice;
     pricePerType.placeholder = minimalPrice;
-    // pricePerType.addEventListener('input', () => {
+    console.log(pricePerType.placeholder);
+    pricePerType.addEventListener('change', () => {
     if (pricePerType.value < minimalPrice) {
       pricePerType.setCustomValidity(`Минимальная стоимость проживания за ночь ${minimalPrice} руб.`);
     }
     // });
     pricePerType.reportValidity();
   };
-  // habitation.addEventListener('input', minPrice);
-  pricePerType.addEventListener('input', minPrice);
+  habitation.addEventListener('change', minPrice);
+  // pricePerType.addEventListener('input', minPrice);
 
   //Время заезда
   const timeIn = document.querySelector('#timein');

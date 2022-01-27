@@ -46,13 +46,13 @@ function formValidator() {
     Number(roomNumber);
     Number(capacity);
     let message = '';
-    if (capacity.value > 1 && roomNumber.value === 1) {
+    if (capacity.value > 1 && roomNumber.value == 1) {
       message = 'В номере с 1 комнатой может разместиться только 1 гость';
-    } else if ( capacity.value > 2 && roomNumber.value === 2) {
+    } else if ( capacity.value > 2 && roomNumber.value == 2) {
       message = 'В номере с 2 комнатами могут разместиться максимум 2 гостя';
-    } else if (capacity.value > 3 && roomNumber.value === 3) {
+    } else if (capacity.value > 3 && roomNumber.value == 3) {
       message = 'В номере с 3 комнатами могут разместиться максимум 3 гостя';
-    } else if (!capacity.value === 0 && roomNumber.value === 100) {
+    } else if (!capacity.value == 0 && roomNumber.value == 100) {
       message = 'Номер не предназначен для гостей';
     }
     roomNumber.setCustomValidity(message);
@@ -60,9 +60,8 @@ function formValidator() {
     capacity.setCustomValidity(message);
     capacity.reportValidity();
   };
-
-  roomNumber.addEventListener('change', addValidatorForRooms);
-  capacity.addEventListener('change', addValidatorForRooms);
+  capacity.addEventListener('input', addValidatorForRooms);
+  roomNumber.addEventListener('input', addValidatorForRooms);
 
   //Тип жилья
   const habitation = document.querySelector('#type');
@@ -79,7 +78,7 @@ function formValidator() {
     const minimalPrice = priceForHabitation[habitation.value];
     pricePerType.min = minimalPrice;
     pricePerType.placeholder = minimalPrice;
-    pricePerType.addEventListener('input', () => {
+    pricePerType.addEventListener('change', () => {
       if (pricePerType.value < minimalPrice) {
         pricePerType.setCustomValidity(`Минимальная стоимость проживания за ночь ${minimalPrice} руб.`);
       }

@@ -79,7 +79,7 @@ function formValidator() {
     const minimalPrice = priceForHabitation[habitation.value];
     pricePerType.min = minimalPrice;
     pricePerType.placeholder = minimalPrice;
-    pricePerType.addEventListener('change', () => {
+    pricePerType.addEventListener('input', () => {
       if (pricePerType.value < minimalPrice) {
         pricePerType.setCustomValidity(`Минимальная стоимость проживания за ночь ${minimalPrice} руб.`);
       }

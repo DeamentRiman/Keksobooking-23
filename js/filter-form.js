@@ -1,6 +1,5 @@
 const OFFERS_VALUE = 10;
 const ANY = 'any';
-
 const price = {
   low: 'low',
   middle: 'middle',
@@ -9,24 +8,24 @@ const price = {
   maxCost:'50000',
 };
 
-//найдем фильтры на странице
+//Филтры на странице
 const filterFormMap = document.querySelector('.map__filters');
 const housingType = filterFormMap.querySelector('#housing-type');
 const housingPrice = filterFormMap.querySelector('#housing-price');
 const housingRooms = filterFormMap.querySelector('#housing-rooms');
 const housingGuests = filterFormMap.querySelector('#housing-guests');
 
-//найдем выбранное значение типа жилья
+//Тип жилья
 const filterMatch = (filterValue, dataField) => filterValue === ANY || String(filterValue) === String(dataField);
 
-//определение выбранного значения цены
+//Цена
 const priceMatch = (filterValue, dataField) =>
   filterValue === ANY ||
   (filterValue === price.low && dataField < price.minCost) ||
   (filterValue === price.middle && dataField >= price.minCost && dataField < price.maxCost) ||
   (filterValue === price.high && dataField >= price.maxCost);
 
-//дополнительные опции
+//Дополнительные опции
 const selectFeatures = (filterValue, dataValue) => filterValue.every((feature) => dataValue.includes(feature));
 
 const getFinalFilter = (offers) => {

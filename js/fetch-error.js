@@ -1,5 +1,4 @@
 //функция провальной попытки получения данных с сервера
-
 const mainPage = document.querySelector('main');
 
 function errorUpload (error) {

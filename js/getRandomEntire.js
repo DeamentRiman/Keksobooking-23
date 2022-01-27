@@ -15,6 +15,4 @@ function getRandomEntire(min, max) {
   }
 }
 
-export {
-  getRandomEntire
-};
+export {getRandomEntire};

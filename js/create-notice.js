@@ -1,5 +1,4 @@
 //Модуль генерации разметки похожих объявлений на основе рандомных данных
-
 import {createValues} from './create-values.js';
 const MASSIVE_COUNT = 10; //количество элементов в массиве
 

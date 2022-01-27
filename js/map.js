@@ -6,7 +6,6 @@ import {errorUpload} from './fetch-error.js';
 import {getFinalFilter, filterFormMap} from './filter-form.js';
 import {debounce} from './utils/debounce.js';
 
-
 const MAP_SCALE = 10;
 const TOKIO_LAT = 35.6895000;
 const TOKIO_LNG = 139.6917100;
@@ -82,34 +81,50 @@ const createCustomPopup = ({author, offer}) => {
   const imageCard = document.querySelector('#card').content.querySelector('.popup__photo');
   const addCard = popupCard.cloneNode(true);
   const popupPhotos = addCard.querySelector('.popup__photos');
+  const featuresList = addCard.querySelector('.popup__features');
+  featuresList.innerHTML = '';
   function imageInputer () {
-    /*проверка количества изображений в объекте offer*/
+    /*Проверка количества изображений в объекте offer*/
     if (offer.photos.length > 1) {
       for (let i = 1; i < offer.photos.length; i++) {
         const imageTemplate = imageCard.cloneNode(false);
         popupPhotos.appendChild(imageTemplate);
       }
     }
-    /*добавление каждому изображению значения src атрибута*/
+    /*Добавление каждому изображению значения src атрибута*/
     const imageMassive = addCard.querySelectorAll('.popup__photo');
     for (let i = 0; i < offer.photos.length; i ++){
       imageMassive[i].src = offer.photos[i];
     }
   }
+
+  //Функция для формирования списка дополнительных опций
+  function featuresListInputer () {
+    const featuresListValue = offer.features;
+    if (featuresListValue) {
+      featuresListValue.forEach((item) => {
+        const li = document.createElement('li');
+        li.classList.add('popup__feature');
+        li.classList.add(`popup__feature--${item}`);
+        featuresList.appendChild(li);
+      });
+    }
+  }
+
   offer.title ? addCard.querySelector('.popup__title').textContent = offer.title : addCard.querySelector('.popup__title').classList.add('hidden');
   offer.address ? addCard.querySelector('.popup__text--address').textContent = offer.address : addCard.querySelector('.popup__text--address').classList.add('hidden');
   offer.price ? addCard.querySelector('.popup__text--price').textContent = `${offer.price} ₽/ночь` : addCard.querySelector('.popup__text--price').classList.add('hidden');
   offer.type ? addCard.querySelector('.popup__type').textContent = typeOfHouse[offer.type] : addCard.querySelector('.popup__type').classList.add('hidden');
   offer.rooms || offer.guests ? addCard.querySelector('.popup__text--capacity').textContent = `${offer.rooms} комнаты для ${offer.guests} гостей` : addCard.querySelector('.popup__text--capacity').classList.add('hidden');
   offer.checkin || offer.checkout ? addCard.querySelector('.popup__text--time').textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}` : addCard.querySelector('.popup__text--time').classList.add('hidden');
-  offer.features ? addCard.querySelector('.popup__features').textContent = offer.features : addCard.querySelector('.popup__features').classList.add('hidden');
+  offer.features ? featuresListInputer() : addCard.querySelector('.popup__features').classList.add('hidden');
   offer.description ? addCard.querySelector('.popup__description').textContent = offer.description : addCard.querySelector('.popup__description').classList.add('hidden');
   offer.photos ? imageInputer() : addCard.querySelector('.popup__photo').classList.add('hidden');
   author.avatar ? addCard.querySelector('.popup__avatar').src = author.avatar : addCard.querySelector('.popup__avatar').classList.add('hidden');
   return addCard;
 };
 
-//дополнительный слой на карте для отрисовки меток
+//Дополнительный слой на карте для отрисовки меток
 const markerGroup = L.layerGroup().addTo(map);
 
 //Функция для отрисовки метки и балуна на карте
@@ -135,7 +150,7 @@ const createMarker = ({author, offer, location}) => {
 //   createMarker({author, offer, location});
 // });
 
-//функция для передачи данных сортировки
+//Функция для передачи данных сортировки
 const DELAY_TIME = 500;
 
 function dataForFilter (value) {
@@ -152,11 +167,14 @@ function dataForFilter (value) {
 const getDataUrl = 'https://23.javascript.pages.academy/keksobooking/data';
 const sendDataUrl = 'https://23.javascript.pages.academy/keksobooking/';
 const OFFERS_QUANTITY = 10;
+let defaultValues;
 
-//функция успешного получения данных с сервера
+//Функция успешного получения данных с сервера
 function successfulUpload(value) {
   dataForFilter(value);
   const generateNewOfferList = value.slice(0, OFFERS_QUANTITY);
+  defaultValues = generateNewOfferList;
+  markerGroup.clearLayers();
   generateNewOfferList.forEach(({author, offer, location}) => {
     createMarker({author, offer, location});
   });
@@ -193,6 +211,10 @@ function removeFormData () {
     lng: TOKIO_LNG,
   });
   filterFormMap.reset();
+  markerGroup.clearLayers();
+  defaultValues.forEach(({author, offer, location}) => {
+    createMarker({author, offer, location});
+  });
   defaultAddress.defaultValue = (`${TOKIO_LAT}, ${TOKIO_LNG}`);
 }
 
@@ -246,56 +268,5 @@ adForm.addEventListener('submit', (evt) => {
     .then((response) => (response.ok) ? successfullSend() : (() => {throw new Error (`Упс, что то пошло не так. Ошибка ${response.status}, так досадно, что не получилось отправить данные на сервер.`);})())
     .catch((error) => failSend(error));
 });
-
-
-// const OFFERS_VALUE = 10;
-// const ANY = 'any';
-
-// const price = {
-//   low: 'low',
-//   middle: 'middle',
-//   high: 'high',
-//   minCost:'10000',
-//   maxCost:'50000',
-// };
-
-// //найдем фильтры на странице
-// const filterFormMap = document.querySelector('.map__filters');
-// const housingType = filterFormMap.querySelector('#housing-type');
-// const housingPrice = filterFormMap.querySelector('#housing-price');
-// const housingRooms = filterFormMap.querySelector('#housing-rooms');
-// const housingGuests = filterFormMap.querySelector('#housing-guests');
-
-// //найдем выбранное значение типа жилья
-// const filterMatch = (filterValue, dataField) => filterValue === ANY || String(filterValue) === String(dataField);
-
-// //определение выбранного значения цены
-// const priceMatch = (filterValue, dataField) =>
-//   filterValue === ANY ||
-//   (filterValue === price.low && dataField < price.minCost) ||
-//   (filterValue === price.middle && dataField >= price.minCost && dataField < price.maxCost) ||
-//   (filterValue === price.high && dataField >= price.maxCost);
-
-// //дополнительные опции
-// const selectFeatures = (filterValue, dataValue) => filterValue.every((feature) => dataValue.includes(feature));
-
-// const getFinalFilter = (offers) => {
-//   console.log(offers);
-//   const allCheckFeatures = Array.from(filterFormMap.querySelectorAll('.map__checkbox:checked')).map((element) => element.value);
-//   const filterData = offers.filter((item) => {
-//     const typeValue = item.offer.type ? item.offer.type : '';
-//     const priceValue = item.offer.price ? item.offer.price : '';
-//     const roomsValue = item.offer.rooms ? item.offer.rooms : '';
-//     const guestsValue = item.offer.guests ? item.offer.guests : '';
-//     const featuresValue = item.offer.features ? item.offer.features : [];
-
-//     return filterMatch(housingType.value, typeValue) &&
-//     priceMatch(housingPrice.value, priceValue) &&
-//     filterMatch(housingRooms.value, roomsValue) &&
-//     filterMatch(housingGuests.value, guestsValue) &&
-//     selectFeatures(allCheckFeatures, featuresValue);
-//   });
-//   return filterData.slice(0, OFFERS_VALUE);
-// };
 
 export {map};
